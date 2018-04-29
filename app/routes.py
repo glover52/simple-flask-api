@@ -38,6 +38,8 @@ def messages(key=None):
         if request.form.get('ttl'):
             try:
                 ttl = int(escape(request.form['ttl']))
+                if ttl <= 1:
+                    return "TTL must be above 0", status.HTTP_400_BAD_REQUEST
             except ValueError:
                 return "TTL must be an integer", status.HTTP_400_BAD_REQUEST
 

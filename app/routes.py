@@ -1,7 +1,8 @@
 from app import app
 from flask import request
 from flask import jsonify
-from app import cache
+# from app import cache
+from app import mc
 
 
 @app.route('/')
@@ -24,27 +25,34 @@ def messages(id=None):
         mId = request.form['id']
         message = request.form['message']
 
-        if cache.get(mId) is not None:
-            return "Key already exists!"
+        if mc.get(mId) is not None:
+            return "Key already exists"
 
-        cache[mId] = message
+        # if cache.get(mId) is not None:
+        #     return "Key already exists!"
+
+        # cache[mId] = message
+        mc.set(mId, message)
         return "Done"
 
     else:
         # Return message with given id
         if id is not None:
-            message = cache.get(id)
+            # message = cache.get(id)
+            message = mc.get(id)
             # Return message if found else return error message
             return message if message is not None else ("Resource not found", 404)
 
         # Return all messages if no id was given
-        json_data = [{"id": k, "message": x} for k, x in cache.items()]
+        # json_data = [{"id": k, "message": x} for k, x in cache.items()]
+        json_data = []
         return jsonify(Messages=json_data)
 
 
 @app.route('/clearCache', methods=['POST'])
 def clear_cache():
-    cache.clear()
+    # cache.clear()
+    mc.flush_all()
     return "Cache cleared!"
 
 
@@ -53,7 +61,7 @@ def set_ttl():
     if request.form.get('ttl'):
         try:
             ttl = int(request.form.get['ttl'])
-            cache.max_age = ttl
+            # cache.max_age = ttl
             return "Cache TTL set to {} seconds.".format(ttl)
         except ValueError:
             return "Invalid time"

@@ -25,7 +25,7 @@ def messages(key=None):
 
         # Set the id of the new message and check for abnormalities
         try:
-            key = int(escape(request.form['id']))
+            key = str(int(escape(request.form['id'])))
             if mc.get(key) is not None:
                 return "ID already exists", status.HTTP_400_BAD_REQUEST
         except ValueError:
@@ -39,7 +39,7 @@ def messages(key=None):
             try:
                 ttl = int(escape(request.form['ttl']))
             except ValueError:
-                pass
+                return "TTL must be an integer", status.HTTP_400_BAD_REQUEST
 
         # Add message to the cache and return success message
         mc.set(id, message, time=ttl)
@@ -53,7 +53,8 @@ def messages(key=None):
         # Return message with given id
         if key is not None:
             try:
-                message = mc.get(int(escape(key)))
+                key = str(int(escape(key)))
+                message = mc.get(key)
                 if message is not None:
                     return message
                 else:

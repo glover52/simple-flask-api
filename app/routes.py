@@ -24,6 +24,7 @@ def messages(id=None):
 
         mId = request.form['id']
         message = request.form['message']
+        ttl = int(request.form['ttl']) if request.form.get('ttl') else 30
 
         if mc.get(mId) is not None:
             return "Key already exists"
@@ -32,7 +33,7 @@ def messages(id=None):
         #     return "Key already exists!"
 
         # cache[mId] = message
-        mc.set(mId, message)
+        mc.set(mId, message, time=ttl)
         return "Done"
 
     else:

@@ -31,8 +31,6 @@ def messages(key=None):
                 return "ID already exists", status.HTTP_400_BAD_REQUEST
         except ValueError:
             return "ID must be an integer", status.HTTP_400_BAD_REQUEST
-        except:
-            return "Unexpected error: {}".format(sys.exc_info()[0])
 
         message = escape(request.form['message'])
 
@@ -45,7 +43,7 @@ def messages(key=None):
                 return "TTL must be an integer", status.HTTP_400_BAD_REQUEST
 
         # Add message to the cache and return success message
-        mc.set(id, message, time=ttl)
+        mc.set(key, message, time=ttl)
         return "Message \"{}\" added with ID of: {} (TTL:{}s)".format(
             message,
             key,

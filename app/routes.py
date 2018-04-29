@@ -70,7 +70,7 @@ def messages(key=None):
         return jsonify(Messages=json_data)
 
 
-@app.route('/clearCache', methods=['POST'])
+@app.route('/clearcache', methods=['POST'])
 def clear_cache():
     mc.flush_all()
     return "Cache cleared!"

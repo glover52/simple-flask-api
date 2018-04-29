@@ -2,7 +2,6 @@ from flask import request
 from flask import jsonify
 from flask_api import status
 from re import escape
-
 from app import app
 from app import mc  # The cache
 
@@ -25,26 +24,26 @@ def messages(key=None):
 
         # Set the id of the new message and check for abnormalities
         try:
-            key = str(int(escape(request.form['id'])))
+            key = str(int(request.form['id']))
             if mc.get(key) is not None:
                 return "ID already exists", status.HTTP_400_BAD_REQUEST
         except ValueError:
             return "ID must be an integer", status.HTTP_400_BAD_REQUEST
 
-        message = escape(request.form['message'])
+        message = request.form['message']
 
         # Set time to live (TTL) for document
         ttl = 30
         if request.form.get('ttl'):
             try:
-                ttl = int(escape(request.form['ttl']))
+                ttl = int(request.form['ttl'])
                 if ttl <= 1:
                     return "TTL must be above 0", status.HTTP_400_BAD_REQUEST
             except ValueError:
                 return "TTL must be an integer", status.HTTP_400_BAD_REQUEST
 
         # Add message to the cache and return success message
-        mc.set(key, message, time=ttl)
+        mc.set(key, request.form['message'], time=ttl)
         return "Message \"{}\" added with ID of: {} (TTL:{}s)".format(
             message,
             key,
@@ -55,7 +54,7 @@ def messages(key=None):
         # Return message with given id
         if key is not None:
             try:
-                key = str(int(escape(key)))
+                key = str(int(key))
                 message = mc.get(key)
                 if message is not None:
                     return message

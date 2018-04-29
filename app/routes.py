@@ -1,7 +1,9 @@
-from app import app
 from flask import request
 from flask import jsonify
-# from app import cache
+from flask_api import status
+from re import escape
+
+from app import app
 from app import mc
 
 
@@ -12,37 +14,52 @@ def index():
 
 
 @app.route('/messages', methods=['GET', 'POST'])
-@app.route('/messages/<path:id>', methods=['GET'])
-def messages(id=None):
+@app.route('/messages/<path:key>', methods=['GET'])
+def messages(key=None):
     if request.method == "POST":
+        # Check if required POST body elements exist to form document
         if not request.form.get('id'):
-            return "ERROR: No ID entered"
-
-        # Check if 'message' key exists
+            return "ERROR: No ID entered", status.HTTP_400_BAD_REQUEST
         if not request.form.get('message'):
-            return "ERROR: No message entered"
+            return "ERROR: No message entered", status.HTTP_400_BAD_REQUEST
 
-        mId = request.form['id']
-        message = request.form['message']
-        ttl = int(request.form['ttl']) if request.form.get('ttl') else 30
+        # Set the id of the new message and check for abnormalities
+        try:
+            key = int(escape(request.form['id']))
+            if mc.get(key) is not None:
+                return "ID already exists", status.HTTP_400_BAD_REQUEST
+        except ValueError:
+            return "ID must be an integer", status.HTTP_400_BAD_REQUEST
 
-        if mc.get(mId) is not None:
-            return "Key already exists"
+        message = escape(request.form['message'])
 
-        # if cache.get(mId) is not None:
-        #     return "Key already exists!"
+        # Set time to live (TTL) for cache setting
+        ttl = 30
+        if request.form.get('ttl'):
+            try:
+                ttl = int(escape(request.form['ttl']))
+            except ValueError:
+                pass
 
-        # cache[mId] = message
-        mc.set(mId, message, time=ttl)
-        return "Done"
+        # Add message to the cache and return success message
+        mc.set(id, message, time=ttl)
+        return "Message \"{}\" added with ID of: {} (TTL:{}s)".format(
+            message,
+            key,
+            ttl
+        )
 
     else:
         # Return message with given id
-        if id is not None:
-            # message = cache.get(id)
-            message = mc.get(id)
-            # Return message if found else return error message
-            return message if message is not None else ("Resource not found", 404)
+        if key is not None:
+            try:
+                message = mc.get(int(escape(key)))
+                if message is not None:
+                    return message
+                else:
+                    return "Resource not found", status.HTTP_404_NOT_FOUND
+            except ValueError:
+                return "Please enter a number", status.HTTP_400_BAD_REQUEST
 
         # Return all messages if no id was given
         # json_data = [{"id": k, "message": x} for k, x in cache.items()]
@@ -52,19 +69,5 @@ def messages(id=None):
 
 @app.route('/clearCache', methods=['POST'])
 def clear_cache():
-    # cache.clear()
     mc.flush_all()
     return "Cache cleared!"
-
-
-@app.route('/setTTL', methods=['POST'])
-def set_ttl():
-    if request.form.get('ttl'):
-        try:
-            ttl = int(request.form.get['ttl'])
-            # cache.max_age = ttl
-            return "Cache TTL set to {} seconds.".format(ttl)
-        except ValueError:
-            return "Invalid time"
-    else:
-        return "No TTL time entered."

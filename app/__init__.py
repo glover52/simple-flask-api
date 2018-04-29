@@ -1,17 +1,11 @@
 from flask import Flask
-from expiringdict import ExpiringDict
 from pylibmc import Client
 import os
-# from flask_sqlalchemy import SQLAlchemy
-# from flask_migrate import Migrate
-# from config import Config
 
 app = Flask(__name__)
-cache = ExpiringDict(max_len=100, max_age_seconds=30)
 servers = os.environ.get('MEMCACHIER_SERVERS', '').split(',')
 user = os.environ.get('MEMCACHIER_USERNAME', '')
 passw = os.environ.get('MEMCACHIER_PASSWORD', '')
-
 mc = Client(servers, binary=True,
                     username=user, password=passw,
                     behaviors={
@@ -33,8 +27,5 @@ mc = Client(servers, binary=True,
                       'retry_timeout': 2,
                       'dead_timeout': 30,
                     })
-# app.config.from_object(Config)
-# db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
 
 from app import routes

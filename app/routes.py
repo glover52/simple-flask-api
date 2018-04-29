@@ -1,7 +1,6 @@
 from flask import request
 from flask import jsonify
 from flask_api import status
-from re import escape
 from app import app
 from app import mc  # The cache
 

@@ -1,6 +1,4 @@
 # Project Information
----
-Heroku Domain: [enigmatic-hollows-71380][heroku-project]
 This project implements a simple online cache to store documents of the form:
 ```
 {
@@ -19,8 +17,8 @@ Sending a `GET` request to `/messages/<id>` where `<id>` is a valid document id 
 ### Clearing the cache
 Sending an empty `POST` request to the `/clearcache` endpoint flushes all existing data from the cache.
 
-
 ### Deploying to [Heroku][heroku]
+Heroku Domain: [enigmatic-hollows-71380][heroku-project]
 1. Install Heroku CLI and login using personal credentials
 2. Clone the repository
 `git clone https://github.com/glover52/simple-flask-api.git`
@@ -36,7 +34,6 @@ Sending an empty `POST` request to the `/clearcache` endpoint flushes all existi
 
 
 # Reference Material
----
 Listed below is a complete list of all the reference material used in creating this project and any extra material that may be useful should you need any assistance. It includes official documentation as well as references from third party websites and articles. Read it carefully and adopt appropriately to similar projects!
 
 ### Heroku Python Tutorials

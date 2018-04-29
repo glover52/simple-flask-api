@@ -6,6 +6,7 @@ app = Flask(__name__)
 servers = os.environ.get('MEMCACHIER_SERVERS', '').split(',')
 user = os.environ.get('MEMCACHIER_USERNAME', '')
 passw = os.environ.get('MEMCACHIER_PASSWORD', '')
+# Client config obtained from https://devcenter.heroku.com/articles/memcachier#python
 mc = Client(servers, binary=True,
                     username=user, password=passw,
                     behaviors={

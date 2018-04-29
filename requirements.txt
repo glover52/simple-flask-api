@@ -1,5 +1,4 @@
 click==6.7
-expiringdict==1.1.4
 Flask==1.0
 Flask-API==1.0
 gunicorn==19.8.0

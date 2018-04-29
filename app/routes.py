@@ -2,16 +2,15 @@ from flask import request
 from flask import jsonify
 from flask_api import status
 from re import escape
-import sys
 
 from app import app
-from app import mc
+from app import mc  # The cache
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return "Hello, World!"
+    return ""
 
 
 @app.route('/messages', methods=['GET', 'POST'])
@@ -34,7 +33,7 @@ def messages(key=None):
 
         message = escape(request.form['message'])
 
-        # Set time to live (TTL) for cache setting
+        # Set time to live (TTL) for document
         ttl = 30
         if request.form.get('ttl'):
             try:

@@ -2,6 +2,7 @@ from flask import request
 from flask import jsonify
 from flask_api import status
 from re import escape
+import sys
 
 from app import app
 from app import mc
@@ -30,6 +31,8 @@ def messages(key=None):
                 return "ID already exists", status.HTTP_400_BAD_REQUEST
         except ValueError:
             return "ID must be an integer", status.HTTP_400_BAD_REQUEST
+        except:
+            return "Unexpected error: {}".format(sys.exc_info()[0])
 
         message = escape(request.form['message'])
 
